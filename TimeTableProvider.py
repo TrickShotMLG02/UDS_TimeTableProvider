@@ -198,6 +198,7 @@ def main():
 
     # UPDATE THE LOCAL CALENDAR FILE
     updateCalendarFile(newCal)
+    print("Successfully updated calendar!")
 
 
 if __name__ == "__main__":
