@@ -165,7 +165,7 @@ def updateCalendarFile(cal: Calendar):
     directory = Path.cwd() / 'MyCalendar'
 
     # Write to a specific directory
-    directory = calendarPath
+    directory = Path(calendarPath)
     try:
         directory.mkdir(parents=True, exist_ok=False)
     except FileExistsError:
@@ -196,8 +196,8 @@ def main():
         # MERGE ALL CALENDARS INTO ONE FILE
         newCal = mergeCalendars(newCals)
 
-        # UPDATE THE LOCAL CALENDAR FILE
-        updateCalendarFile(newCal)
+    # UPDATE THE LOCAL CALENDAR FILE
+    updateCalendarFile(newCal)
 
 
 if __name__ == "__main__":
