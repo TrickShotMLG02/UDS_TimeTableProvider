@@ -1,6 +1,7 @@
 from collections import namedtuple
 from icalendar import Calendar, Event, vCalAddress, vText
 from datetime import datetime
+from datetime import timedelta
 from pathlib import Path
 import os
 import pytz
@@ -143,6 +144,32 @@ def removeTutorials(cal: Calendar, assignedTutorial: Tutorial):
     return cal
 
 
+# Adjust all times in a calendar to the academic hour if not already done
+def adjustAcademicHour(cal: Calendar):
+    for component in cal.walk():
+        # Check if the component is an event
+        if component.name == "VEVENT":
+
+            try:
+                eventStartTimeStamp = component.get('dtstart').dt.astimezone(pytz.timezone('Europe/Berlin'))
+                eventEndTimeStamp = component.get('dtend').dt.astimezone(pytz.timezone('Europe/Berlin'))
+                eventStart = eventStartTimeStamp.strftime('%M')
+                eventEnd = eventEndTimeStamp.strftime('%M')
+
+                if eventStart == "00":
+                    # add 15 minutes to start time in component
+                    component.get('dtstart').dt = eventStartTimeStamp + timedelta(minutes=15)
+
+                if eventEnd == "00":
+                    # subtract 15 minutes from end time in component
+                    component.get('dtend').dt = eventEndTimeStamp - timedelta(minutes=15) - timedelta(hours=1)
+
+
+            except:
+                pass
+    return cal
+
+
 # ADD ALL ENTRIES TO A CALENDAR
 def addEntriesToCalendar(cal, entries):
     return -3
@@ -188,6 +215,7 @@ def main():
         cal = calEntry.first
         tut = calEntry.second
         cal = removeTutorials(cal, tut)
+        cal = adjustAcademicHour(cal)
         newCals.append(cal)
 
         # ADD ALL ENTRIES TO A CALENDAR
