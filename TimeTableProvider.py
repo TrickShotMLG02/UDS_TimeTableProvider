@@ -153,6 +153,7 @@ def adjustAcademicHour(cal: Calendar):
             try:
                 eventStartTimeStamp = component.get('dtstart').dt.astimezone(pytz.timezone('Europe/Berlin'))
                 eventEndTimeStamp = component.get('dtend').dt.astimezone(pytz.timezone('Europe/Berlin'))
+                eventEndTimeStamp = component.get('dtend').dt
                 eventStart = eventStartTimeStamp.strftime('%M')
                 eventEnd = eventEndTimeStamp.strftime('%M')
 
@@ -162,10 +163,15 @@ def adjustAcademicHour(cal: Calendar):
 
                 if eventEnd == "00":
                     # subtract 15 minutes from end time in component
-                    component.get('dtend').dt = eventEndTimeStamp - timedelta(minutes=15) - timedelta(hours=1)
-
-
-            except:
+                    component.get('dtend').dt = eventEndTimeStamp - timedelta(hours=0) - timedelta(minutes=15)
+                    print(component.get('summary') + " - " + str(component.get('dtend').dt.astimezone(pytz.timezone('Europe/Berlin'))))
+                    print(str(eventEndTimeStamp) + " - " + str(component.get('dtend').dt) +  " -> " + str((eventEndTimeStamp - component.get('dtend').dt).total_seconds()))
+                    if ((eventEndTimeStamp - component.get('dtend').dt.astimezone(pytz.timezone('Europe/Berlin'))).total_seconds()) / 60 > 15:
+                        # component.get('dtend').dt = eventEndTimeStamp - timedelta(minutes=0)
+                        print(str(eventEndTimeStamp) + " - " + str(component.get('dtend').dt) +  " -> " + str((eventEndTimeStamp - component.get('dtend').dt).total_seconds()))
+            except Exception as error:
+                print(error)
+                print(component)
                 pass
     return cal
 
@@ -215,7 +221,8 @@ def main():
         cal = calEntry.first
         tut = calEntry.second
         cal = removeTutorials(cal, tut)
-        cal = adjustAcademicHour(cal)
+        # THIS DOES NOT WORK, SINCE THE GUYS FROM CIPSA HAVE TO FORMAT THEIR CALENDAR DATES IN A WEIRD WAY, SUCH THAT 17:00 - 00:15 = 17:45???
+        # cal = adjustAcademicHour(cal)
         newCals.append(cal)
 
         # ADD ALL ENTRIES TO A CALENDAR
